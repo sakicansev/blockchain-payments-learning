@@ -651,6 +651,38 @@ const doc = new Document({
         "confirming that Layer 2 has become the primary payment infrastructure."),
       spacer(),
 
+      h3("What Query 6 Results Tell You"),
+      body("When run in April 2026, the results were unambiguous:"),
+      spacer(),
+      bullet("Ethereum mainnet USDC transfers (30 days)", ": 17,726,135"),
+      bullet("Arbitrum USDC transfers (30 days)", ": 25,243,032"),
+      spacer(),
+      body("Arbitrum processed 42% more USDC transfers than Ethereum mainnet in the same 30-day period. " +
+        "Layer 2 has not merely caught up to mainnet — it has overtaken it. " +
+        "The migration that was theoretical in Stage 1 is now a measured fact."),
+      spacer(),
+      body("The economic interpretation is straightforward. " +
+        "Arbitrum offers the same USDC, the same security guarantees ultimately derived from Ethereum, " +
+        "but at 10 to 50 times lower fees. " +
+        "Users voted with their transactions. The market chose the cheaper option — " +
+        "exactly as economic theory predicts when two close substitutes exist at different price points. " +
+        "This is the scarce resource allocation problem resolving itself through the price mechanism: " +
+        "when Ethereum mainnet became too expensive for everyday payments, " +
+        "demand migrated to the lower-cost Layer 2 alternative."),
+      spacer(),
+      body("This finding also has a direct implication for on-chain analysis methodology. " +
+        "Any analyst who queries only Ethereum mainnet for USDC payment data " +
+        "is now looking at less than 41% of the actual transfer activity. " +
+        "A complete picture of crypto payment flows requires querying mainnet and all major Layer 2 networks simultaneously."),
+      spacer(),
+      callout("Methodological Note",
+        "The USDC contract address is different on each chain — " +
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 on Ethereum mainnet, " +
+        "0xaf88d065e77c8cc2239327c5edb3a432268e5831 on Arbitrum. " +
+        "Always verify the correct contract address for each chain before running cross-chain comparisons. " +
+        "Using the wrong address will return zero results without an error — a silent mistake that could invalidate an entire analysis."),
+      spacer(),
+
       // Query 7
       h3("Query 7: Large Payment Detection — Whale Transfers"),
       body("This query identifies unusually large USDC transfers — transactions above 1 million USDC. " +
