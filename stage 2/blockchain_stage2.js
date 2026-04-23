@@ -486,6 +486,29 @@ const doc = new Document({
         "you are measuring real economic activity flowing through the USDC contract."),
       spacer(),
 
+      h3("What Query 3 Results Tell You"),
+      body("When I ran this query on April 23, 2026, the results showed approximately 425,000 to 650,000 USDC transfers per day " +
+        "over the 90-day period, with daily volumes consistently in the range of USD 40 to 97 billion. " +
+        "To put that in perspective: the entire GDP of the Netherlands is approximately USD 1.1 trillion per year. " +
+        "Roughly 6% of Dutch annual GDP was moving through USDC on a single day in January 2026. " +
+        "This is not test data or a simulation — this is real economic activity, verifiable by anyone on the public blockchain."),
+      spacer(),
+      body("A few specific observations from the results worth noting:"),
+      spacer(),
+      bullet("February 5, 2026", " showed the highest single-day volume in the dataset at approximately USD 97 billion — " +
+        "notable because this coincides with the period of escalating US-Iran military tensions documented in the crypto geopolitical analysis project."),
+      bullet("February 14, 2026", " showed an unusual dip to USD 37 billion — " +
+        "significantly below the average. Identifying the cause of such anomalies is exactly the kind of analytical work that on-chain data enables."),
+      bullet("Transfer counts", " ranged from 425,000 to over 640,000 per day — " +
+        "demonstrating that USDC is not just used for large institutional transfers but for hundreds of thousands of individual transactions daily."),
+      spacer(),
+      callout("Analytical Habit to Build",
+        "Every time you see an anomaly in your results — a spike, a dip, an unexpected pattern — " +
+        "write down the date and ask: what happened that day? " +
+        "Cross-reference with news, market events, and your other datasets. " +
+        "This habit of connecting on-chain data to real-world events is what separates an analyst from someone who just runs queries."),
+      spacer(),
+
       // Query 4
       h3("Query 4: Gas Fee Analysis — The Scarce Resource in Action"),
       body("This query calculates daily average, minimum, and maximum gas prices. " +
@@ -507,6 +530,26 @@ const doc = new Document({
       body("Visualize this as a line chart. Identify the spikes. " +
         "Cross-reference them with market events from your crypto geopolitical analysis project — " +
         "you may find fee spikes that correspond to the conflict escalation events you already studied."),
+      spacer(),
+
+      h3("What Query 4 Results Tell You"),
+      body("When run over 180 days of Ethereum data, the results reveal the dynamic pricing mechanism " +
+        "from Stage 1 in action. The average gas price (avg_gwei) typically hovers between 0.5 and 2 gwei " +
+        "during normal market conditions — relatively cheap and stable."),
+      spacer(),
+      body("The most analytically interesting column is max_gwei. " +
+        "On October 28, 2025, the average gas price was approximately 1.09 gwei — normal. " +
+        "But the maximum gas price that same day reached 44,565 gwei. " +
+        "That means one actor paid 44,000 times the average price to get their transaction processed immediately. " +
+        "This is the mempool urgency concept from Stage 1 made visible in real data: " +
+        "someone had a time-critical transaction and was willing to pay almost any price. " +
+        "In financial economics this is equivalent to a market order — " +
+        "price is irrelevant, only speed matters."),
+      spacer(),
+      bullet("Normal conditions", ": avg_gwei between 0.5 and 2 — cheap, stable, low demand"),
+      bullet("Elevated conditions", ": avg_gwei between 2 and 10 — moderate congestion, something is happening"),
+      bullet("Congested conditions", ": avg_gwei above 10 — high demand, major market event in progress"),
+      bullet("max_gwei spikes", ": individual actors paying extreme premiums — time-critical transactions, liquidations, arbitrage"),
       spacer(),
 
       // Query 5
@@ -553,6 +596,34 @@ const doc = new Document({
       spacer(),
       body("Note that DAI uses 18 decimals while USDC and USDT use 6. " +
         "Visualize as a stacked bar chart — you will see the relative dominance of each stablecoin in payment flows."),
+      spacer(),
+
+      h3("What Query 5 Results Tell You"),
+      body("The bar chart produced by this query tells a clear and immediate story: " +
+        "USDC dominates stablecoin payment flows on Ethereum mainnet throughout the entire 6-month period. " +
+        "USDT is significant but consistently secondary. DAI is almost invisible at the bottom of the chart."),
+      spacer(),
+      body("The most striking feature is the spike in March 2026, where USDC volume shot above USD 600 billion in a single week. " +
+        "This corresponds directly to the period following the US-Israel strikes on Iran on February 28, 2026 — " +
+        "an event analyzed in the companion crypto geopolitical project in this portfolio. " +
+        "Markets reacted, capital moved, and USDC payment volume exploded. " +
+        "You can literally see a geopolitical shock in the stablecoin payment data."),
+      spacer(),
+      body("The near-invisibility of DAI throughout the chart is also analytically significant. " +
+        "Despite DAI being a major stablecoin by market cap, its transfer volume is a fraction of USDC and USDT. " +
+        "This confirms the Stage 1 observation: DAI is used primarily within DeFi protocols, " +
+        "not as a mainstream payment instrument. The difference in use case is visible in the data."),
+      spacer(),
+      body("The secondary position of USDT on Ethereum is consistent with USDT's known geographic dominance on the Tron network, " +
+        "which is the preferred chain for USDT transfers in Asia and emerging markets. " +
+        "Querying only Ethereum gives an Ethereum-centric view — " +
+        "a reminder that cross-chain analysis is necessary for a complete picture of global stablecoin flows."),
+      spacer(),
+      callout("Connection to Stage 1",
+        "This chart directly validates the stablecoin analysis from Stage 1. " +
+        "Every claim made there about USDC dominance on Ethereum, USDT's Tron preference, " +
+        "and DAI's DeFi-native nature is now visible in real on-chain data. " +
+        "Stage 1 was theory. This chart is evidence."),
       spacer(),
 
       // Query 6
