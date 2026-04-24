@@ -36,9 +36,9 @@ blockchain payment analyst must understand before touching data.
 - Real-world payment protocols — Request Network, Gnosis Pay, Flexa
 
 **Files:**
-- 📄 [`stage-1/Blockchain_Payments_Stage1.pdf`](stage-1/Blockchain_Payments_Stage1.pdf) — read in browser
-- 📝 [`stage-1/Blockchain_Payments_Stage1.docx`](stage-1/Blockchain_Payments_Stage1.docx) — Word document
-- 💻 [`stage-1/blockchain_doc.js`](stage-1/blockchain_doc.js) — Node.js script that generated the document
+- 📄 [`Blockchain_Payments_Stage1.pdf`](Blockchain_Payments_Stage1.pdf) — read in browser
+- 📝 [`stage 1/Blockchain_Payments_Stage1.docx`](<stage 1/Blockchain_Payments_Stage1.docx>) — Word document
+- 💻 [`stage 1/blockchain_doc.js`](<stage 1/blockchain_doc.js>) — Node.js script that generated the document
 
 ---
 
@@ -64,12 +64,21 @@ Built after completing Stage 1 self-assessment (April 2026).
 7. Large payment detection — whale transfers
 8. Fee efficiency analysis — cost per dollar transferred
 9. Payment velocity — transactions per hour
-10. Original research query *(to be completed and published on Dune)*
+10. **Geopolitical impact on USDC payment flows** — original research query
+
+**Key Findings from Stage 2:**
+- Arbitrum processed **42% more USDC transfers** than Ethereum mainnet in April 2026 — Layer 2 has overtaken mainnet
+- USDC payment volume **dropped 66%** on October 7, 2023 — the day of the Hamas attack on Israel
+- The March 2026 USDC spike (>$600B/week) corresponds directly to US-Israel strikes on Iran
+- Ethereum gas fees are a **fixed cost, not a percentage** — making mainnet economically irrational for small payments
+
+**Live Dashboard:**
+👉 [Ethereum Payment Analytics — Saki Cansev](https://dune.com/sakicansev/dashboard-structure-for-payment-analysis)
 
 **Files:**
-- 📄 [`stage-2/Blockchain_Payments_Stage2.pdf`](stage-2/Blockchain_Payments_Stage2.pdf) — read in browser
-- 📝 [`stage-2/Blockchain_Payments_Stage2.docx`](stage-2/Blockchain_Payments_Stage2.docx) — Word document
-- 💻 [`stage-2/blockchain_stage2.js`](stage-2/blockchain_stage2.js) — Node.js script that generated the document
+- 📄 [`Blockchain_Payments_Stage2.pdf`](Blockchain_Payments_Stage2.pdf) — read in browser
+- 📝 [`stage 2/Blockchain_Payments_Stage2.docx`](<stage 2/Blockchain_Payments_Stage2.docx>) — Word document
+- 💻 [`stage 2/blockchain_stage2.js`](<stage 2/blockchain_stage2.js>) — Node.js script that generated the document
 
 ---
 
@@ -96,10 +105,10 @@ Both study guides are generated programmatically using Node.js and the `docx` li
 npm install -g docx
 
 # Generate Stage 1
-node stage-1/blockchain_doc.js
+node "stage 1/blockchain_doc.js"
 
 # Generate Stage 2
-node stage-2/blockchain_stage2.js
+node "stage 2/blockchain_stage2.js"
 ```
 
 ---
