@@ -709,6 +709,31 @@ const doc = new Document({
         "and you follow the chain of transactions manually to understand the context."),
       spacer(),
 
+      h3("What Query 7 Results Tell You"),
+      body("When run in April 2026, the largest single USDC transfer in the 30-day period was 503,029,764 USDC — " +
+        "approximately USD 503 million in a single transaction. " +
+        "Following the transaction hash to Etherscan revealed something analytically critical: " +
+        "the transfer was from Binance wallet 14 to Binance Hot Wallet 34. " +
+        "Both addresses belong to the same entity — Binance, the cryptocurrency exchange. " +
+        "This was not a payment between two different parties. It was an internal fund reorganization."),
+      spacer(),
+      body("This finding directly illustrates the adjusted transaction volume concept established in Stage 1. " +
+        "A naive analyst counting this as a USD 503 million payment would be wrong. " +
+        "It is internal plumbing — Binance moving money between its own wallets. " +
+        "Identifying and filtering out such transfers is essential for accurate payment flow analysis."),
+      spacer(),
+      body("Additional observations from the results: " +
+        "several transfers of exactly 430,000,000 USDC appeared on April 6, 2026 — " +
+        "four transfers of the exact same amount within minutes of each other. " +
+        "Identical round-number transfers in rapid succession are a classic signature of automated institutional settlement systems, " +
+        "not organic payment activity. These are worth investigating further."),
+      spacer(),
+      callout("Key Forensic Skill",
+        "Whale transfer analysis always requires a second step: following the transaction hash to Etherscan " +
+        "to identify whether the transfer was between different economic actors or internal to one entity. " +
+        "The query finds the transactions. The forensic judgment determines what they mean."),
+      spacer(),
+
       // Query 8
       h3("Query 8: Fee Efficiency Analysis — Cost Per Dollar Transferred"),
       body("This query calculates the fee paid as a percentage of value transferred for ETH transactions. " +
@@ -737,6 +762,28 @@ const doc = new Document({
         "This is the economic argument for Layer 2 payments made visible in real data."),
       spacer(),
 
+      h3("What Query 8 Results Tell You"),
+      body("The results from April 2026 revealed a pattern that makes the economic case for Layer 2 impossible to ignore:"),
+      spacer(),
+      bullet("Micro transactions (<0.01 ETH)", ": 3,258,588 transactions — avg fee percentage: 234,445,286,532,103%"),
+      bullet("Small transactions (0.01-0.1 ETH)", ": 1,555,590 transactions — avg fee percentage: 1.01%"),
+      bullet("Medium transactions (0.1-1 ETH)", ": 826,867 transactions — avg fee percentage: 0.36%"),
+      bullet("Large transactions (1-10 ETH)", ": 196,872 transactions — avg fee percentage: 0.033%"),
+      bullet("Whale transactions (>10 ETH)", ": 58,318 transactions — avg fee percentage: 0.002%"),
+      spacer(),
+      body("The micro transaction fee percentage is astronomically high because the NULLIF division produces extreme outliers " +
+        "when transaction values approach zero — this is a known mathematical artifact of the calculation method, not a real fee rate. " +
+        "The meaningful insight is in the Small through Whale categories."),
+      spacer(),
+      body("For small transactions (0.01 to 0.1 ETH), the average fee is approximately 1% of the transaction value. " +
+        "For whale transactions above 10 ETH, the fee is only 0.002% — essentially free at scale. " +
+        "This confirms the fundamental economic problem with Ethereum mainnet for everyday payments: " +
+        "gas fees are a fixed cost, not a percentage of transaction value. " +
+        "The same fee that costs a whale 0.002% costs a small payer 1% or more. " +
+        "Ethereum mainnet is economically efficient for large transfers and economically irrational for small ones — " +
+        "precisely why Layer 2 networks exist."),
+      spacer(),
+
       // Query 9
       h3("Query 9: Payment Velocity — Transactions Per Hour"),
       body("This query measures transaction counts by hour of day, averaged across the last 30 days. " +
@@ -759,25 +806,71 @@ const doc = new Document({
         "your first real data point for the geographic analysis framework developed in Stage 1."),
       spacer(),
 
+      h3("What Query 9 Results Tell You"),
+      body("The results from the last 30 days show a remarkably flat distribution — " +
+        "approximately 89,000 to 100,000 average daily transactions per hour throughout the entire 24-hour cycle. " +
+        "There is no dramatic peak during any specific business hour region."),
+      spacer(),
+      body("This flatness is itself an important finding. It suggests that Ethereum transaction activity is " +
+        "genuinely global — distributed across time zones without a single dominant region driving activity. " +
+        "If US or European activity dominated, we would expect clear peaks during those business hours " +
+        "and significant troughs during Asian night hours. The absence of such peaks indicates " +
+        "that the network is used around the clock by actors in every timezone."),
+      spacer(),
+      body("This finding partially challenges the geographic propagation hypothesis from Stage 1. " +
+        "While specific urgency events may originate from particular regions — " +
+        "as the mempool fee spike analysis suggested — " +
+        "baseline transaction activity appears genuinely distributed globally. " +
+        "The implication for payment analysis is that Ethereum has achieved true 24/7 global payment infrastructure, " +
+        "unlike traditional banking systems which follow regional business hours."),
+      spacer(),
+
       // Query 10
-      h3("Query 10: Your Original Research Query"),
-      body("Query 10 is not provided. It is yours to formulate."),
+      h3("Query 10: Geopolitical Impact on USDC Payment Flows (Original Research)"),
+      body("Research question: Did USDC payment volumes on Ethereum change during the Iran-Israel-USA conflict escalation events " +
+        "documented in the companion crypto geopolitical analysis project?"),
       spacer(),
-      body("Using what you have learned from queries 1 through 9, formulate one original research question " +
-        "about crypto payment flows that interests you — " +
-        "ideally connected to your existing portfolio work. " +
-        "Some starting points:"),
+      body("This query pulls daily USDC transfer volume from October 2023 — before the conflict began — " +
+        "through April 2026, covering all nine key escalation events identified in the geopolitical project."),
       spacer(),
-      bullet("Geopolitical connection:", " Did USDC payment volumes on Ethereum change during the conflict escalation events you analyzed in the crypto geopolitical project?"),
-      bullet("Netherlands relevance:", " Is there any on-chain evidence of EURC adoption relative to USDC on Ethereum?"),
-      bullet("Layer 2 migration:", " At what point in 2024–2025 did Arbitrum USDC transfers first exceed Ethereum mainnet USDC transfers?"),
-      bullet("Mempool urgency:", " Do gas fee spikes on Ethereum correlate with USDC transfer volume spikes on the same day?"),
+      code("SELECT"),
+      code("    DATE_TRUNC('day', evt_block_time) AS date,"),
+      code("    COUNT(*) AS transfer_count,"),
+      code("    SUM(value / 1e6) AS usdc_volume"),
+      code("FROM erc20_ethereum.evt_Transfer"),
+      code("WHERE contract_address = 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"),
+      code("    AND evt_block_time >= TIMESTAMP '2023-10-01'"),
+      code("GROUP BY 1"),
+      code("ORDER BY 1"),
       spacer(),
-      callout("Requirement for Stage 3",
-        "Query 10 must be completed and saved as a public query on your Dune account before progressing to Stage 3. " +
-        "The research question, the query, and a brief interpretation of the results " +
-        "must also be added to the blockchain-payments-learning repository on GitHub. " +
-        "This is your first original on-chain research contribution.", "green"),
+
+      h3("What Query 10 Results Tell You"),
+      body("The results span October 2023 through April 2026 — 2.5 years of USDC payment data covering " +
+        "the entire conflict timeline. The most immediate finding appears on the first key event date:"),
+      spacer(),
+      bullet("October 6, 2023 (day before Hamas attack)", ": 54,835 transfers, USD 6.67 billion"),
+      bullet("October 7, 2023 (Hamas attacks Israel)", ": 38,209 transfers, USD 2.24 billion"),
+      bullet("October 8, 2023 (day after)", ": 37,698 transfers, USD 2.47 billion"),
+      spacer(),
+      body("USDC payment volume dropped by 66% on the day of the October 7 attack compared to the previous day. " +
+        "Markets froze. Transaction activity collapsed. The shock is directly visible in the payment data."),
+      spacer(),
+      body("This finding connects two separate portfolio projects into a single coherent research thread. " +
+        "The crypto geopolitical analysis project showed that BTC and ETH prices fell after the October 7 attack. " +
+        "This query shows that USDC payment volume — a measure of real economic activity, not just price — " +
+        "also collapsed simultaneously. Price reactions and payment behavior moved together, " +
+        "suggesting that the shock affected not just speculative sentiment but actual transactional demand."),
+      spacer(),
+      body("Further analysis of the remaining eight event dates in the dataset would constitute a complete " +
+        "event study of geopolitical shocks on crypto payment flows — " +
+        "a research question with genuine academic and industry relevance " +
+        "that has not been systematically addressed in the published literature."),
+      spacer(),
+      callout("Original Research Contribution",
+        "This query and its findings represent original on-chain research. " +
+        "The combination of a specific geopolitical event timeline with USDC payment flow data " +
+        "produces a novel dataset that directly bridges the geopolitical analysis and blockchain payments " +
+        "strands of this portfolio. Both the query and interpretation are saved publicly at dune.com/@sakicansev.", "green"),
       spacer(),
 
       // ── SECTION 5 ──
