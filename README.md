@@ -16,8 +16,8 @@ Built as part of a self-directed specialization in crypto and fintech analytics.
 |-------|-------|--------|
 | Stage 1 | Conceptual Foundation | ✅ Complete |
 | Stage 2 | On-Chain Data Analysis with Dune Analytics | ✅ Complete |
-| Stage 3 | Building On-Chain Analytics Projects | 🔲 Upcoming |
-| Stage 4 | Smart Contracts & Payment Protocols | 🔲 Upcoming |
+| Stage 3 | Python Integration & Event Study Analysis | 🔵 In Progress |
+| Stage 4 | Smart Contracts & Payment Protocols | ⏳ Upcoming |
 
 ---
 
@@ -82,23 +82,50 @@ Built after completing Stage 1 self-assessment (April 2026).
 
 ---
 
-## Stage 3 — Building On-Chain Analytics Projects *(Upcoming)*
+## Stage 3 — Python Integration & Event Study Analysis *(In Progress)*
 
-Python integration with the Dune API, combining on-chain and off-chain data sources,
-and building the geographic mempool analysis pipeline developed conceptually in Stage 1.
+Python pipeline integrating the Dune Analytics API with the off-chain SQLite price database
+from the companion [crypto-geopolitical-analysis](https://github.com/sakicansev/crypto-geopolitical-analysis) project.
+Completes the full event study of geopolitical shocks on crypto payment flows across all nine conflict events.
+
+**Topics covered:**
+- Dune Analytics API — retrieving saved query results into Python using `get_latest_result_dataframe()`
+- Data pipeline — merging on-chain USDC payment data with off-chain BTC/ETH price data
+- Timezone handling — stripping UTC offset before merging datetime columns
+- Event study methodology — D+1, D+3, D+7 percentage changes across all nine conflict events
+- Three publication-quality charts — USDC volume timeline, event study heatmap, correlation scatter
+- Economic interpretation — liquidity preference, desensitisation hypothesis, EMH applied to on-chain data
+
+**Research question:**  
+Did USDC payment volumes on Ethereum change during the Iran–Israel–USA conflict escalation events — and do those changes correlate with BTC and ETH price reactions?
+
+**Key findings from Stage 3 data retrieval:**
+- Dune Query 10 (ID: 7365284) returned **936 rows** — daily USDC data from October 2023 through April 2026
+- Merged with **917 days** of BTC/ETH price data from the companion project SQLite database
+- October 7, 2023 confirmed in Python: **38,209 transfers, $2.24B volume** — down from 54,835 transfers and $6.67B the previous day (**66% drop**)
+- Price and payment behavior collapsed simultaneously: BTC at $27,968, ETH at $1,634 on the event day
+
+**Dune Query 10:**
+👉 [Geopolitical Impact on USDC Payment Flows](https://dune.com/queries/7365284)
+
+**Files:**
+- 📄 [`Blockchain_Payments_Stage3.pdf`](Blockchain_Payments_Stage3.pdf) — read in browser
+- 📝 [`stage 3/Blockchain_Payments_Stage3.docx`](<stage 3/Blockchain_Payments_Stage3.docx>) — Word document
+- 💻 [`stage 3/blockchain_stage3.js`](<stage 3/blockchain_stage3.js>) — Node.js script that generated the document
+- 📓 `stage 3/notebooks/stage3_event_study.ipynb` — analysis notebook *(in progress)*
 
 ---
 
 ## Stage 4 — Smart Contracts & Payment Protocols *(Upcoming)*
 
-Solidity basics via CryptoZombies, understanding how payment contracts work,
-and deep dives into Request Network and Gnosis Pay infrastructure.
+Solidity basics via CryptoZombies, understanding how payment contracts work at the contract level,
+decoding raw event logs on Dune, and deep dives into Request Network and Gnosis Pay infrastructure.
 
 ---
 
 ## How to Regenerate the Documents
 
-Both study guides are generated programmatically using Node.js and the `docx` library.
+All study guides are generated programmatically using Node.js and the `docx` library.
 
 ```bash
 # Install the docx library
@@ -109,6 +136,9 @@ node "stage 1/blockchain_doc.js"
 
 # Generate Stage 2
 node "stage 2/blockchain_stage2.js"
+
+# Generate Stage 3
+node "stage 3/blockchain_stage3.js"
 ```
 
 ---
@@ -124,4 +154,4 @@ node "stage 2/blockchain_stage2.js"
 
 ## Tools & Technologies
 
-Python · SQL · SQLite · JavaScript · Node.js · Dune Analytics · Jupyter · Pandas · Matplotlib
+Python · SQL · SQLite · JavaScript · Node.js · Dune Analytics · Jupyter · Pandas · Matplotlib · Seaborn · SciPy
