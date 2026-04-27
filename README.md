@@ -16,7 +16,7 @@ Built as part of a self-directed specialization in crypto and fintech analytics.
 |-------|-------|--------|
 | Stage 1 | Conceptual Foundation | ✅ Complete |
 | Stage 2 | On-Chain Data Analysis with Dune Analytics | ✅ Complete |
-| Stage 3 | Python Integration & Event Study Analysis | 🔵 In Progress |
+| Stage 3 | Python Integration & Event Study Analysis | ✅ Complete |
 | Stage 4 | Smart Contracts & Payment Protocols | ⏳ Upcoming |
 
 ---
@@ -82,7 +82,7 @@ Built after completing Stage 1 self-assessment (April 2026).
 
 ---
 
-## Stage 3 — Python Integration & Event Study Analysis *(In Progress)*
+## Stage 3 — Python Integration & Event Study Analysis ✅
 
 Python pipeline integrating the Dune Analytics API with the off-chain SQLite price database
 from the companion [crypto-geopolitical-analysis](https://github.com/sakicansev/crypto-geopolitical-analysis) project.
@@ -99,20 +99,26 @@ Completes the full event study of geopolitical shocks on crypto payment flows ac
 **Research question:**  
 Did USDC payment volumes on Ethereum change during the Iran–Israel–USA conflict escalation events — and do those changes correlate with BTC and ETH price reactions?
 
-**Key findings from Stage 3 data retrieval:**
-- Dune Query 10 (ID: 7365284) returned **936 rows** — daily USDC data from October 2023 through April 2026
-- Merged with **917 days** of BTC/ETH price data from the companion project SQLite database
-- October 7, 2023 confirmed in Python: **38,209 transfers, $2.24B volume** — down from 54,835 transfers and $6.67B the previous day (**66% drop**)
-- Price and payment behavior collapsed simultaneously: BTC at $27,968, ETH at $1,634 on the event day
+**Key findings:**
+- The largest single-day USDC payment freeze was **-74.7%** on April 19, 2024 (Israeli strike near Isfahan) — larger than the October 7, 2023 Hamas attack (+10.2% D+1)
+- Two events show a **delayed surge pattern**: Israel's largest direct strike on Iran (+246.4% D+3) and the Hamas attack (+163.4% D+3) — consistent with a two-phase behavioral response: immediate freeze followed by capital repositioning
+- The Haniyeh assassination produced **divergent behavior**: USDC volume rose (+5.8% D+1) while BTC fell -6.1% at D+3 and ETH fell -27.7% at D+7 — consistent with within-crypto flight-to-stability
+- The February 2026 US-Israel strikes produced a **~$370B single-day spike** — qualitatively different from all prior events, suggesting a structural market regime change between 2023 and 2026
+- Pearson **r = -0.41, p = 0.276** between BTC price change and USDC volume change — negative but not statistically significant at n=9; consistent with flight-to-stability behavior
 
 **Dune Query 10:**
 👉 [Geopolitical Impact on USDC Payment Flows](https://dune.com/queries/7365284)
+
+**Note on data files:**  
+The analysis notebook connects to the SQLite database from the companion project at:  
+`/Users/sakicansev/Documents/crypto-geopolitical-analysis/crypto_geopolitical.db`  
+To run this notebook, clone both repositories and update the database path in Cell 6 to match your local path. The USDC volume CSV (`usdc_daily_volumes.csv`) is included in this repository and requires no additional setup.
 
 **Files:**
 - 📄 [`Blockchain_Payments_Stage3.pdf`](Blockchain_Payments_Stage3.pdf) — read in browser
 - 📝 [`stage 3/Blockchain_Payments_Stage3.docx`](<stage 3/Blockchain_Payments_Stage3.docx>) — Word document
 - 💻 [`stage 3/blockchain_stage3.js`](<stage 3/blockchain_stage3.js>) — Node.js script that generated the document
-- 📓 `stage 3/notebooks/stage3_event_study.ipynb` — analysis notebook *(in progress)*
+- 📓 [`stage 3/stage3_event_study.ipynb`](<stage 3/stage3_event_study.ipynb>) — completed analysis notebook
 
 ---
 
