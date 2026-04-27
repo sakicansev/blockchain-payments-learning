@@ -17,7 +17,7 @@ Built as part of a self-directed specialization in crypto and fintech analytics.
 | Stage 1 | Conceptual Foundation | ✅ Complete |
 | Stage 2 | On-Chain Data Analysis with Dune Analytics | ✅ Complete |
 | Stage 3 | Python Integration & Event Study Analysis | ✅ Complete |
-| Stage 4 | Smart Contracts & Payment Protocols | ⏳ Upcoming |
+| Stage 4 | Smart Contracts & Payment Protocols | 🔵 In Progress |
 
 ---
 
@@ -104,7 +104,7 @@ Did USDC payment volumes on Ethereum change during the Iran–Israel–USA confl
 - Two events show a **delayed surge pattern**: Israel's largest direct strike on Iran (+246.4% D+3) and the Hamas attack (+163.4% D+3) — consistent with a two-phase behavioral response: immediate freeze followed by capital repositioning
 - The Haniyeh assassination produced **divergent behavior**: USDC volume rose (+5.8% D+1) while BTC fell -6.1% at D+3 and ETH fell -27.7% at D+7 — consistent with within-crypto flight-to-stability
 - The February 2026 US-Israel strikes produced a **~$370B single-day spike** — qualitatively different from all prior events, suggesting a structural market regime change between 2023 and 2026
-- Pearson **r = -0.41, p = 0.276** between BTC price change and USDC volume change — negative but not statistically significant at n=9; consistent with flight-to-stability behavior
+- Pearson **r = -0.41, p = 0.276** — negative but not statistically significant at n=9; consistent with flight-to-stability behavior
 
 **Dune Query 10:**
 👉 [Geopolitical Impact on USDC Payment Flows](https://dune.com/queries/7365284)
@@ -122,10 +122,24 @@ To run this notebook, clone both repositories and update the database path in Ce
 
 ---
 
-## Stage 4 — Smart Contracts & Payment Protocols *(Upcoming)*
+## Stage 4 — Smart Contracts & Payment Protocols *(In Progress)*
 
-Solidity basics via CryptoZombies, understanding how payment contracts work at the contract level,
-decoding raw event logs on Dune, and deep dives into Request Network and Gnosis Pay infrastructure.
+The final stage. Goes one level deeper than Stages 2 and 3 — from decoded Spell tables
+into raw contract-level data, real payment protocol architectures, and the analytical
+foundation for the seismograph project.
+
+**Topics covered:**
+- ERC-20 smart contract standard — all 6 functions and 2 events explained at the code level
+- Transfer event raw structure — topic0, topic1, topic2, and data field decoding
+- Raw log analysis on Dune — querying `ethereum.logs` without Spell tables
+- Request Network — on-chain invoicing architecture and Dune query for payment request volume
+- Gnosis Pay — self-custodial Visa card architecture, EURe stablecoin, Safe wallet infrastructure
+- Capstone query — contract-initiated USDC transfer analysis bridging to the seismograph project
+
+**Files:**
+- 📄 [`Blockchain_Payments_Stage4.pdf`](Blockchain_Payments_Stage4.pdf) — read in browser
+- 📝 [`stage 4/Blockchain_Payments_Stage4.docx`](<stage 4/Blockchain_Payments_Stage4.docx>) — Word document
+- 💻 [`stage 4/blockchain_stage4.js`](<stage 4/blockchain_stage4.js>) — Node.js script that generated the document
 
 ---
 
@@ -145,6 +159,9 @@ node "stage 2/blockchain_stage2.js"
 
 # Generate Stage 3
 node "stage 3/blockchain_stage3.js"
+
+# Generate Stage 4
+node "stage 4/blockchain_stage4.js"
 ```
 
 ---
