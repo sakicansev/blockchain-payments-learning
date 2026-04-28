@@ -1,7 +1,6 @@
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   AlignmentType, BorderStyle, WidthType, ShadingType, ExternalHyperlink,
-  LevelFormat
 } = require('docx');
 const fs = require('fs');
 
@@ -17,8 +16,8 @@ const LIGHT_GREEN = "E8F5EE";
 const AMBER       = "7F5700";
 const LIGHT_AMBER = "FFF8E1";
 
-const noBorder   = { style: BorderStyle.NONE, size: 0, color: WHITE };
-const thinBorder = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
+const noBorder    = { style: BorderStyle.NONE, size: 0, color: WHITE };
+const thinBorder  = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
 const thinBorders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
 
 function h1(text) {
@@ -62,6 +61,18 @@ function bullet(bold_part, rest) {
   });
 }
 
+function numbered(n, bold_part, rest) {
+  return new Paragraph({
+    spacing: { before: 60, after: 60 },
+    indent: { left: 360 },
+    children: [
+      new TextRun({ text: `${n}.  `, bold: true, size: 20, font: "Arial", color: TEAL }),
+      new TextRun({ text: bold_part, bold: true, size: 20, font: "Arial", color: DARK }),
+      new TextRun({ text: rest || "", size: 20, font: "Arial", color: DARK }),
+    ]
+  });
+}
+
 function code(text) {
   return new Paragraph({
     spacing: { before: 40, after: 40 },
@@ -90,8 +101,8 @@ function callout(label, text, color) {
   });
 }
 
-function comparisonTable(headers, rows) {
-  const w = [3008, 3009, 3009];
+function twoColTable(headers, rows) {
+  const w = [3008, 6018];
   const headerRow = new TableRow({
     children: headers.map((h, j) => new TableCell({
       borders: thinBorders, shading: { fill: NAVY, type: ShadingType.CLEAR },
@@ -112,8 +123,8 @@ function comparisonTable(headers, rows) {
   return new Table({ width: { size: 9026, type: WidthType.DXA }, columnWidths: w, rows: [headerRow, ...dataRows] });
 }
 
-function twoColTable(headers, rows) {
-  const w = [3008, 6018];
+function threeColTable(headers, rows) {
+  const w = [3008, 3009, 3009];
   const headerRow = new TableRow({
     children: headers.map((h, j) => new TableCell({
       borders: thinBorders, shading: { fill: NAVY, type: ShadingType.CLEAR },
@@ -182,7 +193,7 @@ const doc = new Document({
       h1("Foreword"),
       body("The first three stages of this program built a complete analytical foundation. Stage 1 established the conceptual mechanics of blockchain payment systems. Stage 2 demonstrated that real on-chain data is queryable and economically informative. Stage 3 produced original empirical findings: a Python event study connecting USDC payment flows to nine geopolitical conflict events, revealing a two-phase behavioral response pattern, within-crypto flight-to-stability during the Haniyeh assassination, and a structural market regime change visible in the February 2026 data."),
       spacer(),
-      body("Stage 4 goes one level deeper. Everything analyzed in Stages 2 and 3 \u2014 USDC transfers, token volumes, payment flows \u2014 was observed at the surface level through decoded Spell tables that Dune prepares in advance. This stage explains what is happening underneath those tables: how smart contracts actually execute payment logic, what the raw event log data looks like before decoding, how real payment protocols encode invoices and settlements on-chain, and how to write Dune queries that work directly with contract-level data."),
+      body("Stage 4 goes one level deeper. Everything analyzed in Stages 2 and 3 \u2014 USDC transfers, token volumes, payment flows \u2014 was observed at the surface level through decoded Spell tables that Dune prepares in advance. This stage explains what is happening underneath those tables: how smart contracts actually execute payment logic, what the raw event log data looks like before decoding, how to decode it yourself in Python, how real payment protocols encode invoices and settlements on-chain, and how to write Dune queries that work directly with contract-level data."),
       spacer(),
       body("This is the level of understanding that distinguishes a blockchain data analyst from a general data analyst who happens to work with crypto data. It is also the foundation for the seismograph project \u2014 detecting pre-event on-chain anomalies requires understanding what normal contract-level behavior looks like so that deviations from it become visible."),
       spacer(),
@@ -196,7 +207,7 @@ const doc = new Document({
       spacer(),
 
       callout("Scope of This Document",
-        "This document covers five topics: how ERC-20 smart contracts work and what the Transfer event looks like in raw form; " +
+        "This document covers five topics: how ERC-20 smart contracts work and what the Transfer event looks like in raw form, including how to decode hex data yourself; " +
         "how to decode raw log data on Dune without relying on Spell tables; " +
         "how Request Network encodes payment requests on-chain; " +
         "how Gnosis Pay bridges self-custodial crypto with Visa card infrastructure; " +
@@ -234,32 +245,141 @@ const doc = new Document({
       body("The Transfer event is the most important for payment analysis. Every USDC transfer \u2014 every row in erc20_ethereum.evt_Transfer \u2014 is one emission of this event. Understanding its structure is the key to reading raw log data."),
       spacer(),
 
-      h3("1.3  The Transfer Event in Raw Form"),
+      h3("1.3  Understanding Hexadecimal"),
+      body("Before reading raw event logs, you need to understand hexadecimal \u2014 the numbering system Ethereum uses to store all data. This section explains it intuitively, without requiring any mental arithmetic."),
+      spacer(),
+
+      h4("Why Hexadecimal Exists"),
+      body("Computers store everything in binary \u2014 sequences of 0s and 1s. Eight binary digits grouped together is called a byte. One byte can hold any value from 0 to 255."),
+      spacer(),
+      body("The problem: binary is completely unreadable for humans. And decimal (base 10) doesn't map cleanly onto bytes either \u2014 one byte doesn't correspond to a neat number of decimal digits."),
+      spacer(),
+      body("Hexadecimal (base 16) solves this perfectly. The key insight is: one hex digit = exactly 4 bits, so two hex digits = exactly one byte. Always. Clean, exact, predictable. This is why hex was chosen \u2014 not base 20 or base 8 \u2014 because 16 = 2\u2074, which maps perfectly onto binary. Every byte becomes exactly two hex characters."),
+      spacer(),
+      body("Hex uses the digits 0\u20139 and the letters a\u2013f, giving 16 possible values per digit: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, a, b, c, d, e, f. The prefix 0x simply means 'what follows is written in hex' \u2014 like putting a \u20ac sign before a number to say 'this is euros.' The actual value starts after the 0x."),
+      spacer(),
+
+      h4("How to Read Hex \u2014 The Pair Rule"),
+      body("You never need to calculate hex in your head. The only skill you need is reading in pairs. Every two hex characters is one byte. So a 40-character hex string is 20 bytes \u2014 just count the pairs:"),
+      spacer(),
+      code("1234567890abcdef1234567890abcdef12345678"),
+      code(""),
+      code("12  34  56  78  90  ab  cd  ef  12  34  56  78  90  ab  cd  ef  12  34  56  78"),
+      code(" 1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20"),
+      spacer(),
+      body("20 pairs = 20 bytes. No arithmetic. Just counting pairs. Ethereum addresses are always 20 bytes = 40 hex characters. This is why."),
+      spacer(),
+
+      h4("Converting Hex Numbers \u2014 Use Python, Not Your Head"),
+      body("When you see a hex value like 0x3b9ac9ff, you do not need to convert it manually. That is exactly what Python is for:"),
+      spacer(),
+      code("int('3b9ac9ff', 16)"),
+      code("# Returns: 999999999"),
+      code(""),
+      code("# For USDC with 6 decimals:"),
+      code("999999999 / 1e6"),
+      code("# Returns: 999.999999 USDC"),
+      spacer(),
+      body("One line. Done. The real skill is not arithmetic \u2014 it is recognizing that something is hex-encoded and knowing which tool converts it. You will never calculate base-16 by hand in professional work."),
+      spacer(),
+
+      h3("1.4  The Transfer Event in Raw Form"),
       body("When the USDC contract emits a Transfer event, Ethereum records it as a log entry with the following raw structure:"),
       spacer(),
       code("address:  0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48  (the USDC contract)"),
       code("topic0:   0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"),
-      code("topic1:   0x000000000000000000000000[from_address_padded_to_32_bytes]"),
-      code("topic2:   0x000000000000000000000000[to_address_padded_to_32_bytes]"),
+      code("topic1:   0x000000000000000000000000a9d1e08c7793af67e9d92fe308d5697fb81d3e43"),
+      code("topic2:   0x000000000000000000000000b5d85cbf7cb3ee0d56b3bb207d5fc4b82f43f511"),
       code("data:     0x000000000000000000000000000000000000000000000000000000003b9ac9ff"),
       spacer(),
       body("Breaking this down:"),
       spacer(),
       bullet("topic0", " \u2014 the keccak256 hash of the event signature 'Transfer(address,address,uint256)'. This is how Ethereum identifies what type of event was emitted. Every Transfer event on every ERC-20 token has the same topic0."),
-      bullet("topic1", " \u2014 the from address, zero-padded to 32 bytes. The actual address is the last 20 bytes."),
+      bullet("topic1", " \u2014 the from address, zero-padded to 32 bytes. The actual address is the last 40 hex characters (20 bytes)."),
       bullet("topic2", " \u2014 the to address, zero-padded to 32 bytes."),
-      bullet("data", " \u2014 the token amount in raw units (wei equivalent for the token). For USDC with 6 decimals, 0x3b9ac9ff = 999,999,999 raw units = 999.999999 USDC."),
+      bullet("data", " \u2014 the token amount in raw hex. Decode with Python: int('3b9ac9ff', 16) = 999,999,999 raw units = 999.999999 USDC."),
       spacer(),
 
-      callout("Why This Matters for Analysis",
-        "Dune's Spell tables decode all of this automatically \u2014 you never had to think about topic0 or hex data in Stages 2 and 3. " +
-        "But for tokens or protocols that Dune has not yet decoded, you must query the raw logs table and decode manually. " +
-        "Understanding the raw structure means you can analyze any contract on any chain, not just the ones Dune has prepared tables for. " +
-        "This is the difference between an analyst who can only use pre-built tools and one who can build their own."),
+      h4("Why 32 Bytes?"),
+      body("You may notice that addresses (20 bytes) are padded with zeros to fill a 32-byte slot. The reason is that the EVM reads memory in fixed chunks of exactly 32 bytes at a time \u2014 always. It never reads 'however many bytes this value needs.' It reads 32, moves forward 32, reads the next 32. Fixed grid. No exceptions."),
+      spacer(),
+      body("Think of it like a car park with fixed-size spaces. Every space is the same width \u2014 whether you park a Mini or a truck. The Mini (your 20-byte address) parks in the space but doesn't fill it. The empty space on the left is the padding. The car park doesn't care \u2014 it just knows every space starts exactly 32 bytes from the last one."),
+      spacer(),
+      code("The 32-byte slot (64 hex characters):"),
+      code(""),
+      code("[000000000000000000000000] [a9d1e08c7793af67e9d92fe308d5697fb81d3e43]"),
+      code(" 24 hex chars of padding    40 hex chars = the actual 20-byte address"),
+      spacer(),
+      body("To extract the real address, skip the first 24 hex characters and take the last 40. That is what the Dune query in Section 2 does with SUBSTR(topic1, 27, 40)."),
       spacer(),
 
-      h3("1.4  Gas and Contract Execution"),
-      body("Every function call to a smart contract consumes gas \u2014 exactly as established in Stage 1. But the gas cost is not fixed per function: it depends on what the function does. A simple ERC-20 transfer costs approximately 65,000 gas. A complex DeFi interaction involving multiple contract calls can cost 500,000 gas or more. The analyst implication: gas cost is a proxy for computational complexity. When you see a transaction with unusually high gas consumption, it likely involved multiple contract interactions \u2014 worth investigating."),
+      h4("How to Decode This Yourself \u2014 Three Steps"),
+      body("When Dune has not decoded a contract, you decode the raw log yourself. Here is the complete three-step process:"),
+      spacer(),
+      numbered("1", "Identify the event", " \u2014 go to Etherscan, search the contract address, click Contract \u2192 ABI. Find the event definition. It will say Transfer(address indexed from, address indexed to, uint256 value). Now you know: topic1 = from, topic2 = to, data = value."),
+      numbered("2", "Extract the addresses", " \u2014 take the last 40 characters of topic1 and topic2:"),
+      spacer(),
+      code("topic1 = '0x000000000000000000000000a9d1e08c7793af67e9d92fe308d5697fb81d3e43'"),
+      code("from_address = '0x' + topic1[-40:]"),
+      code("# Result: 0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43"),
+      spacer(),
+      numbered("3", "Decode the value", " \u2014 convert the data field from hex to decimal, then divide by the token's decimals:"),
+      spacer(),
+      code("data = '0x000000000000000000000000000000000000000000000000000000003b9ac9ff'"),
+      code("raw_value = int(data, 16)       # 999999999"),
+      code("usdc_amount = raw_value / 1e6   # 999.999999 USDC"),
+      spacer(),
+      body("Three steps, five lines of Python. You just decoded a raw Ethereum event without any pre-built table, on any contract, on any chain. This is what the claim 'you can analyze any contract' actually means in practice."),
+      spacer(),
+
+      callout("The Real Skill",
+        "Dune's Spell tables do these three steps automatically for popular contracts. " +
+        "When Dune hasn't done it, you do it yourself. " +
+        "The hex knowledge from Section 1.3 is exactly what makes Steps 2 and 3 possible. " +
+        "You are not limited to what Dune has prepared \u2014 you can decode any contract on any chain.", "green"),
+      spacer(),
+
+      h3("1.5  Gas and Contract Execution"),
+      body("Every function call to a smart contract consumes gas \u2014 exactly as established in Stage 1. But the gas cost is not fixed per function: it depends on what the function does."),
+      spacer(),
+
+      h4("What Does Complexity Actually Mean?"),
+      body("Complexity has nothing to do with the amount of money being transferred. You can send $500 million in one simple transfer for 65,000 gas, and you can send $1 in a complex DeFi transaction for 500,000 gas. The amount is irrelevant. Complexity means how many instructions the computer had to execute."),
+      spacer(),
+      body("Think of it like a taxi fare. The fare is not based on how valuable your cargo is. It is based on distance travelled \u2014 how far the meter ran. Whether you are carrying a diamond or a sandwich, the meter runs the same. Gas is the meter. It counts computational steps, not value."),
+      spacer(),
+      body("To make this concrete: when you send USDC from your wallet to another wallet, the contract does three things \u2014 check the sender's balance, subtract from sender, add to receiver. Three steps. About 65,000 gas."),
+      spacer(),
+      body("But beyond sending money to a person, smart contracts let you interact with other contracts. Here is what actually happens when you swap USDC for ETH on Uniswap:"),
+      spacer(),
+      numbered("1", "You send a swap request", " to the Uniswap contract"),
+      numbered("2", "Uniswap checks the current price", " \u2014 calls the price oracle contract \u2192 returns 'ETH is $2,000'"),
+      numbered("3", "Uniswap takes your USDC", " \u2014 calls the USDC contract \u2192 transfers 1,000 USDC from you to the liquidity pool"),
+      numbered("4", "Uniswap sends you ETH", " \u2014 calls the ETH contract \u2192 sends 0.5 ETH to your wallet"),
+      numbered("5", "Done", ""),
+      spacer(),
+      body("That is four contract calls for one swap \u2014 each costs gas, adding up to roughly 150,000\u2013300,000 gas total. Beyond swaps, smart contracts enable borrowing against crypto collateral, earning yield in liquidity pools, paying invoices on-chain, buying NFTs, and voting on protocol governance decisions. Every one of these involves multiple contracts talking to each other, and gas is the bill for all those conversations."),
+      spacer(),
+      twoColTable(["Gas Used", "What It Suggests"],
+        [
+          ["< 65,000", "Simple ETH transfer (no contract interaction)"],
+          ["65,000 \u2013 100,000", "Basic ERC-20 token transfer"],
+          ["100,000 \u2013 300,000", "Single contract interaction (e.g. simple swap)"],
+          ["300,000 \u2013 1,000,000", "Multi-contract DeFi operation"],
+          ["> 1,000,000", "Extremely complex \u2014 worth investigating"],
+        ]
+      ),
+      spacer(),
+      body("On Etherscan, click the Internal Txns tab on any transaction. Each row is one contract calling another. A simple transfer has zero internal transactions. A complex DeFi swap might have 15. That is complexity made visible without any calculation."),
+      spacer(),
+
+      callout("Analyst Implication",
+        "Gas cost is a proxy for computational complexity. " +
+        "If you see a large USDC volume transfer with very high gas consumption in the pre-event window of a conflict, " +
+        "that is not a simple payment between two people. " +
+        "That is an institution executing complex automated logic across multiple contracts. " +
+        "This is exactly the kind of signal the seismograph project would look for \u2014 " +
+        "unusual complexity in an unusual time window.", "amber"),
       spacer(),
 
       // SECTION 2
@@ -279,8 +399,8 @@ const doc = new Document({
           ["tx_hash", "Transaction hash that produced this log"],
           ["contract_address", "Address of the contract that emitted the event"],
           ["topic0", "Event signature hash (identifies event type)"],
-          ["topic1", "First indexed parameter (often the 'from' address)"],
-          ["topic2", "Second indexed parameter (often the 'to' address)"],
+          ["topic1", "First indexed parameter (often the from address)"],
+          ["topic2", "Second indexed parameter (often the to address)"],
           ["topic3", "Third indexed parameter (if present)"],
           ["data", "Non-indexed parameters encoded as hex"],
         ]
@@ -288,26 +408,26 @@ const doc = new Document({
       spacer(),
 
       h3("2.2  Reading a Transfer Event from Raw Logs"),
-      body("This query reads USDC Transfer events directly from the raw logs table, without using the decoded Spell table. It demonstrates manual decoding:"),
+      body("This query reads USDC Transfer events directly from the raw logs table, without using the decoded Spell table. It demonstrates the three-step decoding process from Section 1.4 applied in SQL:"),
       spacer(),
       code("SELECT"),
       code("    block_time,"),
       code("    tx_hash,"),
-      code("    -- Extract 'from' address: last 20 bytes of topic1"),
+      code("    -- Step 2: Extract 'from' address \u2014 last 40 chars of topic1"),
       code("    CONCAT('0x', SUBSTR(topic1, 27, 40)) AS from_address,"),
-      code("    -- Extract 'to' address: last 20 bytes of topic2"),
+      code("    -- Step 2: Extract 'to' address \u2014 last 40 chars of topic2"),
       code("    CONCAT('0x', SUBSTR(topic2, 27, 40)) AS to_address,"),
-      code("    -- Decode amount from hex data field, divide by 1e6 for USDC"),
+      code("    -- Step 3: Decode amount from hex, divide by 1e6 for USDC"),
       code("    bytea2numeric(data) / 1e6 AS usdc_amount"),
       code("FROM ethereum.logs"),
       code("WHERE contract_address = 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"),
-      code("    -- Filter for Transfer events only using topic0 signature hash"),
+      code("    -- Step 1: Filter for Transfer events using topic0 signature hash"),
       code("    AND topic0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"),
       code("    AND block_time >= NOW() - INTERVAL '1' DAY"),
       code("ORDER BY block_time DESC"),
       code("LIMIT 10"),
       spacer(),
-      body("Run this query on Dune and compare it against Query 3 from Stage 2. Both should return identical transfer data \u2014 one using the decoded Spell table, one decoding manually from raw logs. Seeing the same data produced two different ways solidifies your understanding of what Dune's Spell tables are actually doing."),
+      body("Run this query on Dune and compare it against Query 3 from Stage 2. Both should return identical transfer data \u2014 one using the decoded Spell table, one decoding manually from raw logs. Seeing the same data produced two different ways solidifies your understanding of what Dune's Spell tables are actually doing under the hood."),
       spacer(),
 
       callout("Key Insight",
@@ -318,15 +438,13 @@ const doc = new Document({
       spacer(),
 
       h3("2.3  Finding Events for Any Contract"),
-      body("The power of raw log analysis is that it works for any contract, not just the ones Dune has decoded. The workflow for analyzing a new protocol:"),
+      body("The power of raw log analysis is that it works for any contract. The workflow for analyzing a new protocol:"),
       spacer(),
-      bullet("Step 1", " \u2014 Find the contract address on Etherscan"),
-      bullet("Step 2", " \u2014 Look at the contract's ABI (Application Binary Interface) to find event signatures"),
-      bullet("Step 3", " \u2014 Compute keccak256 hash of the event signature to get topic0"),
-      bullet("Step 4", " \u2014 Query ethereum.logs filtered by contract_address and topic0"),
-      bullet("Step 5", " \u2014 Decode topic1, topic2, and data fields based on the event parameter types"),
-      spacer(),
-      body("This workflow is what blockchain forensics firms use for analyzing contracts that are too new, too obscure, or too specialized for Dune's automated decoding pipeline. Mastering it means you are not limited to what Dune has already prepared."),
+      numbered("1", "Find the contract address", " on Etherscan"),
+      numbered("2", "Look at the contract ABI", " (Application Binary Interface) to find event signatures"),
+      numbered("3", "Compute keccak256 hash", " of the event signature to get topic0"),
+      numbered("4", "Query ethereum.logs", " filtered by contract_address and topic0"),
+      numbered("5", "Decode topic1, topic2, and data", " based on the event parameter types using the three-step method from Section 1.4"),
       spacer(),
 
       // SECTION 3
@@ -367,7 +485,7 @@ const doc = new Document({
       code("GROUP BY 1"),
       code("ORDER BY 1"),
       spacer(),
-      body("Compare the output to your USDC volume chart from Stage 2. Request Network volume is a fraction of raw USDC transfer volume \u2014 it represents structured B2B invoicing rather than all stablecoin movement. This distinction is analytically important: not all USDC transfers are payments in the commercial sense. Request Network transfers are explicitly structured payment requests, making them a cleaner signal for business payment flow analysis."),
+      body("Compare the output to your USDC volume chart from Stage 2. Request Network volume is a fraction of raw USDC transfer volume \u2014 it represents structured B2B invoicing rather than all stablecoin movement. Not all USDC transfers are payments in the commercial sense. Request Network transfers are explicitly structured payment requests, making them a cleaner signal for business payment flow analysis."),
       spacer(),
 
       // SECTION 4
@@ -409,7 +527,7 @@ const doc = new Document({
       code("GROUP BY 1"),
       code("ORDER BY 1"),
       spacer(),
-      body("Note: the exact contract address should be verified at gnosispay.com/developers before running. Contract addresses can change with protocol upgrades. Always verify addresses against official documentation before using them in analysis \u2014 this is a professional standard that prevents silent errors."),
+      body("Always verify contract addresses against official documentation at gnosispay.com/developers before running. Contract addresses can change with protocol upgrades. Using the wrong address returns zero results without an error \u2014 a silent mistake that could invalidate an entire analysis."),
       spacer(),
 
       // SECTION 5
@@ -418,7 +536,7 @@ const doc = new Document({
       spacer(),
 
       h3("5.1  Query: Contract-Level USDC Payment Analysis"),
-      body("This query goes beyond the surface-level transfer volume queries of Stage 2. It identifies USDC transfers that originated from smart contract calls \u2014 as opposed to simple wallet-to-wallet transfers \u2014 by joining the transfer data with the transactions table to filter for transactions where the originating address is a contract."),
+      body("This query goes beyond the surface-level transfer volume queries of Stage 2. It identifies USDC transfers that originated from smart contract calls \u2014 as opposed to simple wallet-to-wallet transfers \u2014 by joining the transfer data with the transactions table to filter for transactions with high gas consumption indicating multi-contract execution:"),
       spacer(),
       code("SELECT"),
       code("    DATE_TRUNC('day', t.evt_block_time) AS date,"),
@@ -431,15 +549,13 @@ const doc = new Document({
       code("WHERE t.contract_address"),
       code("    = 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"),
       code("    AND t.evt_block_time >= NOW() - INTERVAL '30' DAY"),
-      code("    -- Filter for contract-initiated transfers:"),
-      code("    -- transactions where the 'to' is not the USDC contract"),
-      code("    -- (meaning the USDC transfer was triggered by another contract)"),
-      code("    AND tx.to != 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"),
+      code("    -- gas_used > 100,000 indicates contract-initiated transfer"),
+      code("    -- (simple wallet transfers use ~65,000 gas)"),
       code("    AND tx.gas_used > 100000"),
       code("GROUP BY 1"),
       code("ORDER BY 1"),
       spacer(),
-      body("What this query tells you: the proportion of USDC volume that flows through smart contracts \u2014 DeFi protocols, payment processors, automated market makers \u2014 versus simple person-to-person transfers. Higher average gas usage indicates more complex contract logic. This is a direct measure of how much of USDC's economic activity is automated versus manual."),
+      body("What this query tells you: the proportion of USDC volume that flows through smart contracts \u2014 DeFi protocols, payment processors, automated market makers \u2014 versus simple person-to-person transfers. Higher average gas usage indicates more complex contract logic involving multiple contract calls."),
       spacer(),
 
       h3("5.2  Extending the Query for the Seismograph Project"),
@@ -450,14 +566,14 @@ const doc = new Document({
       bullet("Anomaly detection", " \u2014 flag days where contract-initiated USDC volume exceeds 2 standard deviations above baseline"),
       bullet("Geographic attribution", " \u2014 cross-reference anomalous transactions with known institutional wallet addresses"),
       spacer(),
-      body("This is the analytical pipeline that transforms the event study completed in Stage 3 into a forward-looking detection system. The contract-level view is essential because institutional actors move capital through smart contracts \u2014 not through simple wallet-to-wallet transfers that any retail user makes."),
+      body("This pipeline transforms the event study completed in Stage 3 into a forward-looking detection system. The contract-level view is essential because institutional actors move capital through smart contracts \u2014 not through simple wallet-to-wallet transfers. High gas complexity in a pre-event window is a signal that automated institutional logic was executing. That is the seismograph reading."),
       spacer(),
 
       // SECTION 6
       h1("6. Program Completion"),
       body("Completing Stage 4 marks the end of the Blockchain Payments Self-Study Program. The table below summarizes what has been built across all four stages:"),
       spacer(),
-      comparisonTable(["Stage", "Output", "Original Contribution"],
+      threeColTable(["Stage", "Output", "Original Contribution"],
         [
           ["Stage 1", "Conceptual Foundation document", "Geographic mempool propagation framework for detecting urgency origin from node timestamp data"],
           ["Stage 2", "10 Dune queries + public dashboard", "Query 10: USDC payment volume collapsed 66% on October 7, 2023 \u2014 first documented connection between this conflict event and on-chain payment behavior"],
@@ -469,12 +585,15 @@ const doc = new Document({
 
       h3("Self-Check \u2014 Program Completion Criteria"),
       bullet("Can explain the Transfer event log structure", " without referring to notes"),
+      bullet("Can read hex addresses and values", " \u2014 understands the pair rule and uses Python for conversion"),
+      bullet("Can explain why 32-byte padding exists", " \u2014 the fixed-grid EVM memory model"),
       bullet("Can write a Dune query against ethereum.logs", " using raw topic0 filtering"),
+      bullet("Can explain the three-step decoding process", " from Section 1.4"),
+      bullet("Can explain the difference between simple and complex transactions", " using the gas threshold guide"),
       bullet("Can explain the difference between Request Network and raw USDC transfers", " as payment signals"),
       bullet("Can explain what makes Gnosis Pay architecturally different", " from custodial crypto cards"),
       bullet("Capstone query run and results interpreted", " on Dune"),
       bullet("All four stage documents committed to GitHub", ""),
-      bullet("Portfolio README updated with all findings", ""),
       spacer(),
 
       callout("What Comes Next \u2014 The Seismograph Project",
@@ -482,8 +601,9 @@ const doc = new Document({
         "a geopolitical early-warning system using on-chain crypto data. " +
         "The hypothesis: state actors and their financial networks move capital before military action becomes public, " +
         "creating detectable anomalies in on-chain data. " +
-        "Using the nine conflict events already documented, analyze 72-hour pre-event windows " +
-        "for anomalous patterns in whale transfers, USDC volume, gas fee urgency, and mempool fee distribution. " +
+        "Using the nine conflict events already documented, analyze the 72-hour pre-event windows " +
+        "for anomalous patterns: unusual whale transfers, USDC volume spikes, abnormal gas fee urgency, " +
+        "mempool fee distribution shifts, and large wallet accumulation patterns. " +
         "Cross-reference with the geographic mempool propagation framework from Stage 1. " +
         "The goal: a seismograph-style alert system that identifies pre-event on-chain signatures " +
         "that statistically precede geopolitical escalation. " +
@@ -501,7 +621,6 @@ const doc = new Document({
       spacer(),
       h4("Request Network"),
       bullet("Request Network documentation", " \u2014 docs.request.network"),
-      bullet("Request Network on Dune", " \u2014 dune.com/docs/data-tables/decoded"),
       spacer(),
       h4("Gnosis Pay"),
       bullet("Gnosis Pay documentation", " \u2014 gnosispay.com"),
@@ -537,5 +656,5 @@ const doc = new Document({
 
 Packer.toBuffer(doc).then(buffer => {
   fs.writeFileSync('/home/claude/Blockchain_Payments_Stage4.docx', buffer);
-  console.log('Stage 4 done.');
+  console.log('Stage 4 updated.');
 });
