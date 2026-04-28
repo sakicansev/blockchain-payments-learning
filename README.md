@@ -17,7 +17,7 @@ Built as part of a self-directed specialization in crypto and fintech analytics.
 | Stage 1 | Conceptual Foundation | ✅ Complete |
 | Stage 2 | On-Chain Data Analysis with Dune Analytics | ✅ Complete |
 | Stage 3 | Python Integration & Event Study Analysis | ✅ Complete |
-| Stage 4 | Smart Contracts & Payment Protocols | 🔵 In Progress |
+| Stage 4 | Smart Contracts & Payment Protocols | ✅ Complete |
 
 ---
 
@@ -122,7 +122,7 @@ To run this notebook, clone both repositories and update the database path in Ce
 
 ---
 
-## Stage 4 — Smart Contracts & Payment Protocols *(In Progress)*
+## Stage 4 — Smart Contracts & Payment Protocols ✅
 
 The final stage. Goes one level deeper than Stages 2 and 3 — from decoded Spell tables
 into raw contract-level data, real payment protocol architectures, and the analytical
@@ -130,11 +130,23 @@ foundation for the seismograph project.
 
 **Topics covered:**
 - ERC-20 smart contract standard — all 6 functions and 2 events explained at the code level
+- Hashing functions and keccak256 — what topic0 is and how it is derived
+- Hexadecimal — the pair rule, why it exists, and Python conversion (no mental arithmetic)
 - Transfer event raw structure — topic0, topic1, topic2, and data field decoding
-- Raw log analysis on Dune — querying `ethereum.logs` without Spell tables
-- Request Network — on-chain invoicing architecture and Dune query for payment request volume
-- Gnosis Pay — self-custodial Visa card architecture, EURe stablecoin, Safe wallet infrastructure
+- Why 32-byte padding exists — the fixed-grid EVM memory model explained
+- Three-step decoding process — decode any contract on any chain without Spell tables
+- Varbinary on Dune — `TO_HEX()` and `varbinary_to_uint256()` for raw log queries
+- Gas complexity — what it means, the threshold guide, and the Uniswap swap example
+- Request Network — on-chain invoicing architecture as a design pattern
+- Gnosis Pay — self-custodial Visa card architecture, EURe, Safe wallet infrastructure
+- EU payment sovereignty — Digital Euro, Wero, and how Gnosis Pay fits the future European payment stack
 - Capstone query — contract-initiated USDC transfer analysis bridging to the seismograph project
+
+**Dune Queries (Stage 4):**
+👉 [Stage 4 — Raw Log Decoding: USDC Transfer Events (No Spell Table)](https://dune.com/sakicansev)
+
+**Key insight:**  
+Gas cost is a proxy for computational complexity — not transaction value. A $500M simple transfer costs 65,000 gas. A $1 DeFi swap costs 300,000+ gas. High gas complexity in a pre-event window is the seismograph signal.
 
 **Files:**
 - 📄 [`Blockchain_Payments_Stage4.pdf`](Blockchain_Payments_Stage4.pdf) — read in browser
@@ -163,6 +175,18 @@ node "stage 3/blockchain_stage3.js"
 # Generate Stage 4
 node "stage 4/blockchain_stage4.js"
 ```
+
+---
+
+## Next Project — The Seismograph
+
+A geopolitical early-warning system using on-chain crypto data.
+
+**Hypothesis:** State actors and their financial networks move capital before military action becomes public, creating detectable anomalies in on-chain data — similar to how a seismograph detects small vibrations before an earthquake.
+
+**Approach:** Using the nine conflict events already documented, analyze 72-hour pre-event windows for anomalous patterns: unusual whale transfers, USDC volume spikes, abnormal gas fee urgency, mempool fee distribution shifts, and large wallet accumulation patterns. Cross-reference with the geographic mempool propagation framework from Stage 1.
+
+**Tools:** Python · Dune Analytics · Blocknative API · SQLite · scipy anomaly detection
 
 ---
 
