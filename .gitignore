@@ -1,6 +1,5 @@
-*.db
-benim.ipynb
 .env
-__pycache__/
+benim.ipynb
 .ipynb_checkpoints/
+*.db
 .DS_Store
